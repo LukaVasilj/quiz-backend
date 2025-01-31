@@ -18,6 +18,8 @@ import Shop from './pages/Shop';
 import Friends from './pages/Friends';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
+import Trening from './pages/Trening';
+import Matchmaking from './pages/Matchmaking';
 
 function App() {
   const [profilePicture, setProfilePicture] = useState('');
@@ -67,6 +69,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/trening" element={<Trening />} />
+        <Route path="/matchmaking" element={<Matchmaking />} />
         <Route path="/quiz" element={<Quiz hints={hints} setHints={setHints} />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/achievements" element={<Achievements />} />

@@ -14,7 +14,6 @@ const randomFacts = [
   { fact: "The capital of Australia is Canberra.", category: "Geography", answer: "Canberra" },
   { fact: "The speed of light is approximately 299,792 kilometers per second.", category: "Physics", answer: "299,792" },
   { fact: "The first computer was invented by Charles Babbage.", category: "Technology", answer: "Charles Babbage" },
-  // Dodajte još 100 random facts ovdje
   { fact: "The Great Wall of China is over 13,000 miles long.", category: "History", answer: "Great Wall of China" },
   { fact: "The human brain contains approximately 86 billion neurons.", category: "Biology", answer: "86 billion" },
   { fact: "The Eiffel Tower is located in Paris, France.", category: "Geography", answer: "Paris" },
@@ -25,10 +24,9 @@ const randomFacts = [
   { fact: "The Pythagorean theorem is a fundamental relation in Euclidean geometry.", category: "Mathematics", answer: "Pythagorean theorem" },
   { fact: "The chemical symbol for gold is Au.", category: "Chemistry", answer: "Au" },
   { fact: "The first successful airplane flight was made by the Wright brothers.", category: "History", answer: "Wright brothers" },
-  // Dodajte još 90 random facts ovdje
 ];
 
-async function generateRandomQuestionAndAnswer(usedFacts) {
+async function generateRandomQuestionAndAnswer(usedFacts = []) {
   let availableFacts = randomFacts.filter(fact => !usedFacts.includes(fact.fact));
   if (availableFacts.length === 0) {
     availableFacts = randomFacts;
@@ -67,26 +65,25 @@ async function generateRandomQuestionAndAnswer(usedFacts) {
       let question = result[0].generated_text.trim();
 
       if (!question.match(/^.*\?$/)) {
-        console.warn("Neispravan format generiranog pitanja:", question);
+        console.warn("Invalid format of generated question:", question);
         return getFallbackQuestion();
       }
 
       const correctAnswer = randomFact.answer;
-      return { question, correctAnswer, usedFacts };
+      return { type: 'input', question, correctAnswer, usedFacts };
     } else {
-      console.warn("Greška pri parsiranju. Generirani tekst:", result[0]?.generated_text);
-      throw new Error("Ne mogu parsirati pitanje i odgovor iz generiranog teksta.");
+      console.warn("Error parsing generated text:", result[0]?.generated_text);
+      throw new Error("Cannot parse question and answer from generated text.");
     }
   } catch (error) {
-    console.error("Greška pri generiranju pitanja:", error);
+    console.error("Error generating question:", error);
     return getFallbackQuestion();
   }
 }
 
 function getFallbackQuestion() {
   const fallbackQuestions = [
-    { question: "What is the capital of France?", correctAnswer: "Paris" },
-    
+    { type: 'input', question: "What is the capital of France?", correctAnswer: "Paris" },
   ];
 
   return fallbackQuestions[Math.floor(Math.random() * fallbackQuestions.length)];

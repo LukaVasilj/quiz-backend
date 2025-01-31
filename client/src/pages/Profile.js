@@ -9,7 +9,8 @@ const Profile = () => {
   const [message, setMessage] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
   const [username, setUsername] = useState(''); // Define the username state
-  
+  const [statistics, setStatistics] = useState([]);
+  const [groups, setGroups] = useState({});
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,10 +32,25 @@ const Profile = () => {
       }
     };
 
+    const fetchStatistics = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/user-statistics', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log('Statistics data:', response.data); // Debug log
+        setStatistics(response.data.statistics);
+        setGroups(response.data.groups);
+      } catch (error) {
+        console.error('Error fetching user statistics:', error);
+      }
+    };
+
     const storedUsername = localStorage.getItem('username'); // Retrieve the username
     setUsername(storedUsername); // Set the username state
   
     fetchProfile();
+    fetchStatistics();
   }, []);
 
   const handleChangePassword = async () => {
@@ -91,6 +107,51 @@ const Profile = () => {
     if (level === 3) return '/ikone/level3-Photoroom.png';
     if (level === 2) return '/ikone/level2-Photoroom.png';
     return '/ikone/level1-Photoroom.png';
+  };
+
+  const renderGroupBars = (category, group) => {
+    const bars = [];
+    for (let i = 1; i <= 5; i++) {
+      bars.push(
+        <div key={i} className={`group-bar ${i <= group ? `filled-${i}` : ''}`}></div>
+      );
+    }
+    return (
+      <div className="group-bar-container">
+        <span>{category}</span>
+        {bars}
+      </div>
+    );
+  };
+
+  const renderStatistics = () => {
+    return statistics.map((stat) => {
+      const group = groups[`${stat.category}_group`];
+      const avgCorrectAnswers = parseFloat(stat.avg_correct_answers);
+      const avgIncorrectAnswers = parseFloat(stat.avg_incorrect_answers);
+      const totalAnswers = avgCorrectAnswers + avgIncorrectAnswers;
+      const correctPercentage = totalAnswers ? (avgCorrectAnswers / totalAnswers) * 100 : 0;
+      const incorrectPercentage = totalAnswers ? (avgIncorrectAnswers / totalAnswers) * 100 : 0;
+      console.log(`Category: ${stat.category}, Correct: ${correctPercentage}, Incorrect: ${incorrectPercentage}`); // Debug log
+      return (
+        <div key={stat.category} className="category-statistics bordered-section">
+          {renderGroupBars(stat.category, group)}
+          <p>Average Time: {stat.avg_time ? stat.avg_time.toFixed(2) : 'N/A'} seconds</p>
+          <p>Correct Answers: {correctPercentage.toFixed(2)}%</p>
+          <p>Incorrect Answers: {incorrectPercentage.toFixed(2)}%</p>
+          <div className="progress-bar">
+            <div
+              className="progress-correct"
+              style={{ width: `${correctPercentage}%` }}
+            ></div>
+            <div
+              className="progress-incorrect"
+              style={{ width: `${incorrectPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+      );
+    });
   };
 
   console.log('User info:', userInfo); // Debug log
@@ -159,6 +220,10 @@ const Profile = () => {
         <h3>Change Profile Picture</h3>
         <input type="file" onChange={handleProfilePictureChange} />
         <button onClick={handleUploadProfilePicture}>Upload Profile Picture</button>
+      </div>
+      <div className="statistics-section">
+        <h3>Statistics</h3>
+        {renderStatistics()}
       </div>
     </div>
     </>

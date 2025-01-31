@@ -146,61 +146,46 @@ function Home() {
         {/* End About Section */}
 
         {/* Team Section */}
-        <section className="team_section section layout_padding">
-          
-          <div className="container">
-            <div className="heading_container heading_center">
-              <h2 class="white">Meet Our <span>Team</span></h2> 
-              <p class="white">Get to know the creators behind Quiz App.</p>
-            </div>
-            <div className="row">
-              <div className="col-md-3">
-                <div className="box">
-                  <div className="img-box">
-                    <img src="/slike/slikamoja.jpg" alt="Creator 1" />
-                  </div>
-                  <div className="detail-box">
-                    <h5>Luka Vasilj</h5>
-                    
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="box">
-                  <div className="img-box">
-                    <img src="/slike/sopta.jpg" alt="Creator 2" />
-                  </div>
-                  <div className="detail-box">
-                    <h5>Marko Sopta</h5>
-                    
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="box">
-                  <div className="img-box">
-                    <img src="/slike/tomas.jpg" alt="Creator 3" />
-                  </div>
-                  <div className="detail-box">
-                    <h5>Ivan Tomas</h5>
-                    
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="box">
-                  <div className="img-box">
-                    <img src="/slike/creator4.png" alt="Creator 4" />
-                  </div>
-                  <div className="detail-box">
-                    <h5>Creator 4</h5>
-                    <p>Role: QA Engineer</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+<section className="team_section section layout_padding">
+  <div className="container">
+    <div className="heading_container heading_center">
+      <h2 className="white">Meet Our <span>Team</span></h2> 
+      <p className="white">Get to know the creators behind Quiz App.</p>
+    </div>
+    <div className="row justify-content-center">
+      <div className="col-md-3">
+        <div className="box">
+          <div className="img-box">
+            <img src="/slike/slikamoja.jpg" alt="Creator 1" />
           </div>
-        </section>
+          <div className="detail-box">
+            <h5>Luka Vasilj</h5>
+          </div>
+        </div>
+      </div>
+      <div className="col-md-3">
+        <div className="box">
+          <div className="img-box">
+            <img src="/slike/sopta.jpg" alt="Creator 2" />
+          </div>
+          <div className="detail-box">
+            <h5>Marko Sopta</h5>
+          </div>
+        </div>
+      </div>
+      <div className="col-md-3">
+        <div className="box">
+          <div className="img-box">
+            <img src="/slike/tomas.jpg" alt="Creator 3" />
+          </div>
+          <div className="detail-box">
+            <h5>Ivan Tomas</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
         {/* End Team Section */}
 
         {/* Footer Section */}

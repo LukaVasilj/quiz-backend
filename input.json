@@ -1,0 +1,14 @@
+{
+    "category": "animals",
+    "correct_answers": 1,
+    "incorrect_answers": 4,
+    "average_time": 1.65,
+    "level": 1,
+    "total_questions": 5,
+    "accuracy": 0.2,
+    "time_per_question": 0.33,
+    "speed_score": 3.03,
+    "difficulty_adjusted_score": 1,
+    "normalized_score": -0.6
+  }
+  

@@ -1,0 +1,607 @@
+[
+  {
+    "question": "At what temperature does water boil?",
+    "category": "science",
+    "answer": "100"
+  },
+  {
+    "question": "How many bones does the human body have?",
+    "category": "science",
+    "answer": "206"
+  },
+  {
+    "question": "What is the tallest mountain in the world?",
+    "category": "geography",
+    "answer": "Mount Everest"
+  },
+  {
+    "question": "What is the longest river in the world?",
+    "category": "geography",
+    "answer": "Nile"
+  },
+  {
+    "question": "In what year did the first manned moon landing occur?",
+    "category": "history",
+    "answer": "1969"
+  },
+  {
+    "question": "Who developed the theory of relativity?",
+    "category": "science",
+    "answer": "Albert Einstein"
+  },
+  {
+    "question": "Who wrote Hamlet?",
+    "category": "history",
+    "answer": "Shakespeare"
+  },
+  {
+    "question": "What is the capital of Australia?",
+    "category": "geography",
+    "answer": "Canberra"
+  },
+  {
+    "question": "What is the speed of light in kilometers per second?",
+    "category": "science",
+    "answer": "299,792"
+  },
+  {
+    "question": "Who invented the first computer?",
+    "category": "history",
+    "answer": "Charles Babbage"
+  },
+  {
+    "question": "How long is the Great Wall of China?",
+    "category": "history",
+    "answer": "13,000 miles"
+  },
+  {
+    "question": "Approximately how many neurons does the human brain contain?",
+    "category": "science",
+    "answer": "86 billion"
+  },
+  {
+    "question": "In which city is the Eiffel Tower located?",
+    "category": "geography",
+    "answer": "Paris"
+  },
+  {
+    "question": "What is the speed of sound in meters per second?",
+    "category": "science",
+    "answer": "343"
+  },
+  {
+    "question": "What percentage of the world's oxygen is produced by the Amazon Rainforest?",
+    "category": "geography",
+    "answer": "20%"
+  },
+  {
+    "question": "Who painted the Mona Lisa?",
+    "category": "history",
+    "answer": "Leonardo da Vinci"
+  },
+  {
+    "question": "What is the largest desert in the world?",
+    "category": "geography",
+    "answer": "Sahara"
+  },
+  {
+    "question": "What theorem is a fundamental relation in Euclidean geometry?",
+    "category": "history",
+    "answer": "Pythagorean theorem"
+  },
+  {
+    "question": "What is the chemical symbol for gold?",
+    "category": "science",
+    "answer": "Au"
+  },
+  {
+    "question": "Who made the first successful airplane flight?",
+    "category": "history",
+    "answer": "Wright brothers"
+  },
+  {
+    "question": "This is only a test for animals quiz",
+    "category": "animals",
+    "answer": "animals"
+  },
+  {
+    "question": "Who directed the movie 'Inception'?",
+    "category": "movies",
+    "answer": "Christopher Nolan"
+  },
+  {
+    "question": "What is the capital of Japan?",
+    "category": "geography",
+    "answer": "Tokyo"
+  },
+  {
+    "question": "What planet is known as the Red Planet?",
+    "category": "science",
+    "answer": "Mars"
+  },
+  {
+    "question": "Who was the first President of the United States?",
+    "category": "history",
+    "answer": "George Washington"
+  },
+  {
+    "question": "What is the largest mammal in the world?",
+    "category": "animals",
+    "answer": "Blue Whale"
+  },
+  {
+    "question": "What is the smallest country in the world?",
+    "category": "geography",
+    "answer": "Vatican City"
+  },
+  {
+    "question": "Who played the character of Harry Potter in the movie series?",
+    "category": "movies",
+    "answer": "Daniel Radcliffe"
+  },
+  {
+    "question": "What is the chemical symbol for water?",
+    "category": "science",
+    "answer": "H2O"
+  },
+  {
+    "question": "In which year did World War II end?",
+    "category": "history",
+    "answer": "1945"
+  },
+  {
+    "question": "What is the fastest land animal?",
+    "category": "animals",
+    "answer": "Cheetah"
+  },
+  {
+    "question": "What is the largest ocean on Earth?",
+    "category": "geography",
+    "answer": "Pacific Ocean"
+  },
+  {
+    "question": "Who directed the movie 'Titanic'?",
+    "category": "movies",
+    "answer": "James Cameron"
+  },
+  {
+    "question": "What is the hardest natural substance on Earth?",
+    "category": "science",
+    "answer": "Diamond"
+  },
+  {
+    "question": "Who was the first man to step on the moon?",
+    "category": "history",
+    "answer": "Neil Armstrong"
+  },
+  {
+    "question": "What is the largest species of shark?",
+    "category": "animals",
+    "answer": "Whale Shark"
+  },
+  {
+    "question": "What is the capital of Canada?",
+    "category": "geography",
+    "answer": "Ottawa"
+  },
+  {
+    "question": "Who played the character of Jack Sparrow in the 'Pirates of the Caribbean' series?",
+    "category": "movies",
+    "answer": "Johnny Depp"
+  },
+  {
+    "question": "What is the chemical symbol for oxygen?",
+    "category": "science",
+    "answer": "O"
+  },
+  {
+    "question": "In which year did the Titanic sink?",
+    "category": "history",
+    "answer": "1912"
+  },
+  {
+    "question": "What is the tallest animal in the world?",
+    "category": "animals",
+    "answer": "Giraffe"
+  },
+  {
+    "question": "What is the capital of Italy?",
+    "category": "geography",
+    "answer": "Rome"
+  },
+  {
+    "question": "Who directed the movie 'The Godfather'?",
+    "category": "movies",
+    "answer": "Francis Ford Coppola"
+  },
+  {
+    "question": "What is the most abundant gas in the Earth's atmosphere?",
+    "category": "science",
+    "answer": "Nitrogen"
+  },
+  {
+    "question": "Who was the first female Prime Minister of the United Kingdom?",
+    "category": "history",
+    "answer": "Margaret Thatcher"
+  },
+  {
+    "question": "What is the largest species of bird?",
+    "category": "animals",
+    "answer": "Ostrich"
+  },
+  {
+    "question": "What is the capital of Brazil?",
+    "category": "geography",
+    "answer": "Brasilia"
+  },
+  {
+    "question": "Who played the character of Forrest Gump in the movie?",
+    "category": "movies",
+    "answer": "Tom Hanks"
+  },
+  {
+    "question": "What is the chemical symbol for sodium?",
+    "category": "science",
+    "answer": "Na"
+  },
+  {
+    "question": "In which year did the Berlin Wall fall?",
+    "category": "history",
+    "answer": "1989"
+  },
+  {
+    "question": "What is the fastest bird in the world?",
+    "category": "animals",
+    "answer": "Peregrine Falcon"
+  },
+  {
+    "question": "What is the capital of Russia?",
+    "category": "geography",
+    "answer": "Moscow"
+  },
+  {
+    "question": "Who directed the movie 'Pulp Fiction'?",
+    "category": "movies",
+    "answer": "Quentin Tarantino"
+  },
+  {
+    "question": "What is the chemical symbol for iron?",
+    "category": "science",
+    "answer": "Fe"
+  },
+  {
+    "question": "What is the largest species of reptile?",
+    "category": "animals",
+    "answer": "Saltwater Crocodile"
+  },
+  {
+    "question": "What is the capital of Germany?",
+    "category": "geography",
+    "answer": "Berlin"
+  },
+  {
+    "question": "Who played the character of James Bond in the movie 'Skyfall'?",
+    "category": "movies",
+    "answer": "Daniel Craig"
+  },
+  {
+    "question": "In which year did the American Civil War end?",
+    "category": "history",
+    "answer": "1865"
+  },
+  {
+    "question": "What is the largest species of fish?",
+    "category": "animals",
+    "answer": "Whale Shark"
+  },
+  {
+    "question": "What is the capital of China?",
+    "category": "geography",
+    "answer": "Beijing"
+  },
+  {
+    "question": "Who directed the movie 'The Shawshank Redemption'?",
+    "category": "movies",
+    "answer": "Frank Darabont"
+  },
+  {
+    "question": "What is the chemical symbol for silver?",
+    "category": "science",
+    "answer": "Ag"
+  },
+  {
+    "question": "Who was the first Emperor of Rome?",
+    "category": "history",
+    "answer": "Augustus"
+  },
+  {
+    "question": "What is the largest species of amphibian?",
+    "category": "animals",
+    "answer": "Chinese Giant Salamander"
+  },
+  {
+    "question": "What is the capital of India?",
+    "category": "geography",
+    "answer": "New Delhi"
+  },
+  {
+    "question": "Who played the character of Tony Stark in the 'Iron Man' series?",
+    "category": "movies",
+    "answer": "Robert Downey Jr."
+  },
+  {
+    "question": "What is the chemical symbol for carbon?",
+    "category": "science",
+    "answer": "C"
+  },
+  {
+    "question": "In which year did the French Revolution begin?",
+    "category": "history",
+    "answer": "1789"
+  },
+  {
+    "question": "What is the largest species of rodent?",
+    "category": "animals",
+    "answer": "Capybara"
+  },
+  {
+    "question": "What is the capital of South Korea?",
+    "category": "geography",
+    "answer": "Seoul"
+  },
+  {
+    "question": "Who directed the movie 'Avatar'?",
+    "category": "movies",
+    "answer": "James Cameron"
+  },
+  {
+    "question": "What is the chemical symbol for helium?",
+    "category": "science",
+    "answer": "He"
+  },
+  {
+    "question": "What is the largest species of marsupial?",
+    "category": "animals",
+    "answer": "Red Kangaroo"
+  },
+  {
+    "question": "What is the capital of Mexico?",
+    "category": "geography",
+    "answer": "Mexico City"
+  },
+  {
+    "question": "Who played the character of Neo in 'The Matrix' series?",
+    "category": "movies",
+    "answer": "Keanu Reeves"
+  },
+  {
+    "question": "What is the chemical symbol for nitrogen?",
+    "category": "science",
+    "answer": "N"
+  },
+  {
+    "question": "In which year did the Soviet Union collapse?",
+    "category": "history",
+    "answer": "1991"
+  },
+  {
+    "question": "What is the largest species of primate?",
+    "category": "animals",
+    "answer": "Eastern Gorilla"
+  },
+  {
+    "question": "What is the capital of Egypt?",
+    "category": "geography",
+    "answer": "Cairo"
+  },
+  {
+    "question": "Who directed the movie 'Jurassic Park'?",
+    "category": "movies",
+    "answer": "Steven Spielberg"
+  },
+  {
+    "question": "What is the chemical symbol for potassium?",
+    "category": "science",
+    "answer": "K"
+  },
+  {
+    "question": "Who was the first President of South Africa?",
+    "category": "history",
+    "answer": "Nelson Mandela"
+  },
+  {
+    "question": "What is the largest species of cat?",
+    "category": "animals",
+    "answer": "Tiger"
+  },
+  {
+    "question": "What is the capital of Argentina?",
+    "category": "geography",
+    "answer": "Buenos Aires"
+  },
+  {
+    "question": "Who played the character of Frodo Baggins in 'The Lord of the Rings' series?",
+    "category": "movies",
+    "answer": "Elijah Wood"
+  },
+  {
+    "question": "What is the chemical symbol for calcium?",
+    "category": "science",
+    "answer": "Ca"
+  },
+  {
+    "question": "In which year did the American Revolution begin?",
+    "category": "history",
+    "answer": "1775"
+  },
+  {
+    "question": "What is the largest species of bear?",
+    "category": "animals",
+    "answer": "Polar Bear"
+  },
+  {
+    "question": "What is the capital of Spain?",
+    "category": "geography",
+    "answer": "Madrid"
+  },
+  {
+    "question": "Who directed the movie 'The Dark Knight'?",
+    "category": "movies",
+    "answer": "Christopher Nolan"
+  },
+  {
+    "question": "What is the chemical symbol for chlorine?",
+    "category": "science",
+    "answer": "Cl"
+  },
+  {
+    "question": "Who was the first female Prime Minister of India?",
+    "category": "history",
+    "answer": "Indira Gandhi"
+  },
+  {
+    "question": "What is the largest species of deer?",
+    "category": "animals",
+    "answer": "Moose"
+  },
+  {
+    "question": "Who played the character of Luke Skywalker in 'Star Wars'?",
+    "category": "movies",
+    "answer": "Mark Hamill"
+  },
+  {
+    "question": "What is the chemical symbol for hydrogen?",
+    "category": "science",
+    "answer": "H"
+  },
+  {
+    "question": "In which year did the Russian Revolution begin?",
+    "category": "history",
+    "answer": "1917"
+  },
+  {
+    "question": "What is the largest species of dolphin?",
+    "category": "animals",
+    "answer": "Orca"
+  },
+  {
+    "question": "What is the capital of Norway?",
+    "category": "geography",
+    "answer": "Oslo"
+  },
+  {
+    "question": "Who directed the movie 'Jaws'?",
+    "category": "movies",
+    "answer": "Steven Spielberg"
+  },
+  {
+    "question": "What is the chemical symbol for mercury?",
+    "category": "science",
+    "answer": "Hg"
+  },
+  {
+    "question": "What is the largest species of penguin?",
+    "category": "animals",
+    "answer": "Emperor Penguin"
+  },
+  {
+    "question": "What is the capital of Greece?",
+    "category": "geography",
+    "answer": "Athens"
+  },
+  {
+    "question": "Who played the character of Indiana Jones?",
+    "category": "movies",
+    "answer": "Harrison Ford"
+  },
+  {
+    "question": "What is the chemical symbol for lead?",
+    "category": "science",
+    "answer": "Pb"
+  },
+  {
+    "question": "What is the fastest marine animal?",
+    "category": "animals",
+    "answer": "Sailfish"
+  },
+  {
+    "question": "What is the capital of Portugal?",
+    "category": "geography",
+    "answer": "Lisbon"
+  },
+  {
+    "question": "Who directed the movie 'E.T. the Extra-Terrestrial'?",
+    "category": "movies",
+    "answer": "Steven Spielberg"
+  },
+  {
+    "question": "What is the chemical symbol for aluminum?",
+    "category": "science",
+    "answer": "Al"
+  },
+  {
+    "question": "In which year did World War I begin?",
+    "category": "history",
+    "answer": "1914"
+  },
+  {
+    "question": "What is the largest species of snake?",
+    "category": "animals",
+    "answer": "Green Anaconda"
+  },
+  {
+    "question": "What is the capital of Sweden?",
+    "category": "geography",
+    "answer": "Stockholm"
+  },
+  {
+    "question": "Who played the character of James Bond in 'Goldfinger'?",
+    "category": "movies",
+    "answer": "Sean Connery"
+  },
+  {
+    "question": "What is the chemical symbol for zinc?",
+    "category": "science",
+    "answer": "Zn"
+  },
+  {
+    "question": "Who was the first man to walk on the moon?",
+    "category": "history",
+    "answer": "Neil Armstrong"
+  },
+  {
+    "question": "What is the largest species of lizard?",
+    "category": "animals",
+    "answer": "Komodo Dragon"
+  },
+  {
+    "question": "What is the capital of New Zealand?",
+    "category": "geography",
+    "answer": "Wellington"
+  },
+  {
+    "question": "Who played the character of Tony Stark in 'Iron Man'?",
+    "category": "movies",
+    "answer": "Robert Downey Jr."
+  },
+  {
+    "question": "What is the chemical symbol for sulfur?",
+    "category": "science",
+    "answer": "S"
+  },
+  {
+    "question": "In which year did the American Civil War begin?",
+    "category": "history",
+    "answer": "1861"
+  },
+  {
+    "question": "What is the largest species of whale?",
+    "category": "animals",
+    "answer": "Blue Whale"
+  },
+  {
+    "question": "What is the capital of South Africa?",
+    "category": "geography",
+    "answer": "Pretoria"
+  }
+]

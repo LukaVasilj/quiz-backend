@@ -8,9 +8,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs'); // Dodajte ovu liniju
+const { PythonShell } = require('python-shell');
+const { spawn } = require('child_process');
+
 require('dotenv').config();
 
 const { generateRandomQuestionAndAnswer } = require('./questionGenerator');
+const { generateTrainingQuestion } = require('./trainingQuestionGenerator');
+const { generateTrainingQuestion2 } = require('./trainingQuestionGenerator2');
+
 
 // Add the generateHint function here
 const generateHint = (correctAnswer, currentAnswer) => {
@@ -18,7 +25,11 @@ const generateHint = (correctAnswer, currentAnswer) => {
     return correctAnswer.charAt(0); // Return the first letter if no current answer
   }
 
-  const nextCharIndex = currentAnswer.length;
+  let nextCharIndex = currentAnswer.length;
+  while (nextCharIndex < correctAnswer.length && correctAnswer.charAt(nextCharIndex) === ' ') {
+    nextCharIndex++; // Skip spaces
+  }
+
   if (nextCharIndex < correctAnswer.length) {
     return correctAnswer.substring(0, nextCharIndex + 1); // Return the next letter
   }
@@ -76,11 +87,14 @@ db.connect((err) => {
 // Middleware to authenticate user and attach userId and username to socket
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
+  console.log('Received token:', token); // Debug log
   if (!token) {
+    console.error('No token provided'); // Debug log
     return next(new Error('Authentication error'));
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
+      console.error('Token verification failed:', err); // Debug log
       return next(new Error('Authentication error'));
     }
     socket.userId = decoded.id;
@@ -88,10 +102,11 @@ io.use((socket, next) => {
     const query = 'SELECT username FROM users WHERE id = ?';
     db.query(query, [decoded.id], (err, results) => {
       if (err || results.length === 0) {
+        console.error('User not found or DB error:', err); // Debug log
         return next(new Error('User not found'));
       }
       socket.username = results[0].username;
-      console.log(`Socket authenticated: ${socket.username}`);
+      console.log(`Socket authenticated: ${socket.username}`); // Debug log
       next();
     });
   });
@@ -196,7 +211,271 @@ const updateAchievements = (userId, points, quizzesCompleted, correctAnswers) =>
 };
 
 // WebSocket logika
+// WebSocket logika za matchmaking
+// WebSocket logika za matchmaking
 const onlineUsers = new Set(); // Track online users
+const waitingPlayers = {}; // Track waiting players by category and group
+let matchmakingRoomUsersData = {}; // Svi podaci o korisnicima po sobama za matchmaking kviz
+
+io.on('connection', (socket) => {
+  console.log('Korisnik povezan: ' + socket.id);
+
+  onlineUsers.add(socket.userId);
+  console.log('Online users:', Array.from(onlineUsers)); // Debug log
+
+  socket.on('findMatch', ({ username, category }) => {
+    console.log(`Korisnik ${username} traži protivnika u kategoriji ${category}`);
+
+    // Fetch user's group for the selected category
+    const groupQuery = `SELECT ${category}_group AS userGroup FROM users WHERE id = ?`;
+    db.query(groupQuery, [socket.userId], (err, results) => {
+      if (err || results.length === 0) {
+        console.error('Error fetching user group:', err);
+        socket.emit('error', 'Error fetching user group');
+        return;
+      }
+
+      const userGroup = results[0].userGroup;
+      console.log(`User ${username} is in group ${userGroup} for category ${category}`);
+
+      if (!waitingPlayers[category]) {
+        waitingPlayers[category] = {};
+      }
+
+      if (!waitingPlayers[category][userGroup]) {
+        waitingPlayers[category][userGroup] = [];
+      }
+
+      console.log('Waiting players in category and group:', category, userGroup, waitingPlayers[category][userGroup]); // Debug log
+
+      if (waitingPlayers[category][userGroup].length > 0) {
+        const opponentSocketId = waitingPlayers[category][userGroup].shift();
+        const roomId = `room_${Date.now()}`;
+        console.log(`Creating room with ID: ${roomId}`); // Debug log
+        socket.join(roomId);
+        io.to(opponentSocketId).socketsJoin(roomId);
+        const opponentSocket = io.sockets.sockets.get(opponentSocketId);
+        io.to(roomId).emit('matchFound', { roomId, users: [
+          { id: socket.userId, username: socket.username, points: 0 },
+          { id: opponentSocket.userId, username: opponentSocket.username, points: 0 }
+        ]});
+        console.log(`Match found! Room ID: ${roomId}`);
+
+        // Initialize room data
+        matchmakingRoomUsersData[roomId] = [
+          { id: socket.userId, username: socket.username, points: 0 },
+          { id: opponentSocket.userId, username: opponentSocket.username, points: 0 }
+        ];
+
+        // Pokreni kviz nakon 5 sekundi
+        setTimeout(() => {
+          startMatchmakingQuiz(roomId, category);
+        }, 5000);
+      } else {
+        waitingPlayers[category][userGroup].push(socket.id);
+        socket.emit('findingOpponent');
+        console.log(`Korisnik ${username} čeka protivnika u kategoriji ${category} i grupi ${userGroup}`);
+      }
+    });
+  });
+
+  const fetchNextMatchmakingQuestion = async (roomId, category) => {
+    try {
+      let questionData;
+      const random = Math.random() < 0.5;
+      if (random) {
+        questionData = generateTrainingQuestion(category);
+      } else {
+        questionData = generateTrainingQuestion2(category);
+      }
+      if (questionData.error) {
+        throw new Error(questionData.error);
+      }
+      const { question, correctAnswer, type, options } = questionData;
+      console.log(`Generated question for room ID: ${roomId}`); // Debug log
+      io.to(roomId).emit('newQuestion', { question, correctAnswer, type, options });
+
+      // Spremanje točnog odgovora u sobu
+      let room = io.sockets.adapter.rooms.get(roomId);
+      room.correctAnswer = correctAnswer;
+      room.userAnswers = []; // Resetiramo odgovore za novu rundu
+
+      io.to(roomId).emit('startQuiz');
+    } catch (error) {
+      console.error('Greška pri generiranju pitanja:', error);
+      io.to(roomId).emit('error', 'Došlo je do greške prilikom generiranja pitanja');
+    }
+  };
+
+  const startMatchmakingQuiz = (roomId, category) => {
+    console.log(`Starting quiz for room ID: ${roomId} with category: ${category}`); // Debug log
+    if (!roomId) {
+      console.error('Room ID is null'); // Debug log
+      return;
+    }
+
+    let room = io.sockets.adapter.rooms.get(roomId);
+    if (!room) {
+      console.error(`Room ID ${roomId} not found in io.sockets.adapter.rooms`); // Debug log
+      return;
+    }
+    room.userAnswers = room.userAnswers || [];
+    room.questionCount = 0; // Dodajemo brojač pitanja
+    room.usedFacts = room.usedFacts || []; // Dodajemo polje za praćenje korištenih pitanja
+    room.category = category; // Spremamo kategoriju u sobu
+
+    setTimeout(() => fetchNextMatchmakingQuestion(roomId, category), 5000);
+  };
+
+  socket.on('submitMatchmakingAnswer', (roomId, userAnswer) => {
+    console.log(`Received answer for room ID: ${roomId} from user ID: ${socket.userId}`); // Debug log
+    if (!roomId) {
+      console.error('Room ID is null'); // Debug log
+      return;
+    }
+
+    if (!matchmakingRoomUsersData[roomId]) {
+      console.error(`Room ID ${roomId} not found in matchmakingRoomUsersData`); // Debug log
+      return;
+    }
+    const room = io.sockets.adapter.rooms.get(roomId); // Dohvaćanje sobe prema roomId
+    if (!room) {
+      console.error(`Room ID ${roomId} not found in io.sockets.adapter.rooms`); // Debug log
+      return;
+    }
+    
+    // Osiguranje da je userAnswers polje
+    let userAnswers = room.userAnswers || [];
+    
+    // Provjera postoji li već odgovor za ovog korisnika
+    const existingAnswerIndex = userAnswers.findIndex(answer => answer.id === socket.userId);
+    if (existingAnswerIndex !== -1) {
+      // Ažuriranje postojećeg odgovora
+      console.log(`Updating existing answer for user ID: ${socket.userId}`); // Debug log
+      userAnswers[existingAnswerIndex].answer = userAnswer;
+    } else {
+      // Dodavanje novog odgovora
+      console.log(`Adding new answer for user ID: ${socket.userId}`); // Debug log
+      userAnswers.push({ id: socket.userId, answer: userAnswer });
+    }
+    
+    // Spremanje ažuriranih odgovora
+    room.userAnswers = userAnswers;
+    console.log(`Current user answers for room ID: ${roomId}:`, userAnswers); // Debug log
+    
+    if (userAnswers.length === 2) {
+      const correctAnswer = room.correctAnswer;
+    
+      // Ažuriranje bodova
+      userAnswers.forEach(userAnswer => {
+        console.log(`Updating points for user ID: ${userAnswer.id} in room ID: ${roomId}`); // Debug log
+        if (userAnswer.answer === correctAnswer) {
+          const user = matchmakingRoomUsersData[roomId].find(user => user.id === userAnswer.id);
+          if (user) {
+            user.points += 1;
+            console.log(`User ${user.username} now has ${user.points} points`); // Debug log
+          } else {
+            console.error(`User ID ${userAnswer.id} not found in matchmakingRoomUsersData[${roomId}]`); // Debug log
+          }
+        }
+      });
+    
+      room.questionCount = room.questionCount || 0;
+      room.questionCount += 1; // Povećavamo brojač pitanja
+    
+      // Emitiranje rezultata kada oba korisnika odgovore
+      io.to(roomId).emit('results', {
+        userAnswers: userAnswers, // Osigurajte da je to polje
+        correctAnswer,
+        roomUsers: matchmakingRoomUsersData[roomId] // Emitovanje ažuriranih bodova
+      });
+
+      if (room.questionCount >= 5) { // Ako su odgovori na pet pitanja, završavamo kviz
+        setTimeout(() => {
+          const [user1, user2] = matchmakingRoomUsersData[roomId];
+          let winner = null;
+          let loser = null;
+
+          if (user1.points > user2.points) {
+            winner = user1;
+            loser = user2;
+          } else if (user2.points > user1.points) {
+            winner = user2;
+            loser = user1;
+          }
+
+          if (winner && loser) {
+            console.log(`Winner ID: ${winner.id}, Loser ID: ${loser.id}`); // Debug log
+
+            // Ažuriraj bodove u bazi podataka
+            const updateWinnerQuery = 'UPDATE users SET points = points + ? WHERE id = ?';
+            console.log(`Executing query: ${updateWinnerQuery} with values: [${winner.points}, ${winner.id}]`); // Debug log
+            db.query(updateWinnerQuery, [winner.points, winner.id], (err, result) => {
+              if (err) {
+                console.error('Greška pri ažuriranju bodova pobjednika:', err);
+              } else {
+                console.log(`Bodovi ažurirani za pobjednika ${winner.username}`);
+                console.log(`Result: ${JSON.stringify(result)}`); // Debug log
+              }
+            });
+
+            const updateLoserQuery = 'UPDATE users SET points = points - 2 WHERE id = ?';
+            console.log(`Executing query: ${updateLoserQuery} with values: [${loser.id}]`); // Debug log
+            db.query(updateLoserQuery, [loser.id], (err, result) => {
+              if (err) {
+                console.error('Greška pri ažuriranju bodova gubitnika:', err);
+              } else {
+                console.log(`Bodovi ažurirani za gubitnika ${loser.username}`);
+                console.log(`Result: ${JSON.stringify(result)}`); // Debug log
+              }
+            });
+
+            io.to(roomId).emit('quizEnd', {
+              winner: winner.username,
+              loser: loser.username,
+              roomUsers: matchmakingRoomUsersData[roomId]
+            });
+          } else {
+            io.to(roomId).emit('quizEnd', {
+              message: 'Neriješeno!',
+              roomUsers: matchmakingRoomUsersData[roomId]
+            });
+          }
+
+          // Resetovanje sobe
+          delete matchmakingRoomUsersData[roomId];
+        }, 5000); // Dodajemo pauzu od 5 sekundi pre prikazivanja konačnih rezultata
+      } else {
+        // Postavljanje novog pitanja nakon kratke pauze
+        setTimeout(() => fetchNextMatchmakingQuestion(roomId, room.category), 5000);
+      }
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Korisnik isključen: ' + socket.id);
+    onlineUsers.delete(socket.userId);
+    console.log('Online users after disconnect:', Array.from(onlineUsers)); // Debug log
+
+    // Remove user from waiting players
+    for (const category in waitingPlayers) {
+      for (const group in waitingPlayers[category]) {
+        waitingPlayers[category][group] = waitingPlayers[category][group].filter(id => id !== socket.id);
+        console.log(`Updated waiting players in category ${category} and group ${group}:`, waitingPlayers[category][group]); // Debug log
+      }
+    }
+
+    // Uklanjanje korisnika iz svih soba
+    for (const roomId in matchmakingRoomUsersData) {
+      matchmakingRoomUsersData[roomId] = matchmakingRoomUsersData[roomId].filter(user => user.id !== socket.userId);
+      if (matchmakingRoomUsersData[roomId].length === 0) {
+        delete matchmakingRoomUsersData[roomId];
+      } else {
+        io.to(roomId).emit('roomUsers', matchmakingRoomUsersData[roomId]);
+      }
+    }
+  });
+});
 
 // Endpoint to get all users and their online status
 app.get('/users', authenticateToken, (req, res) => {
@@ -1034,8 +1313,200 @@ app.post('/shop/open-second-chest', authenticateToken, (req, res) => {
   });
 });
 
+// Add this route to handle training questions
+app.get('/api/training-question', async (req, res) => {
+  try {
+    const category = req.query.category || 'animals'; // Default to 'animals' if no category is specified
+    console.log(`Received request for training question in category: ${category}`);
+    const questionData = generateTrainingQuestion(category);
+    if (questionData.error) {
+      throw new Error(questionData.error);
+    }
+    console.log('Generated question:', questionData);
+    res.json(questionData);
+  } catch (error) {
+    console.error('Error generating question:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/random-question', async (req, res) => {
+  try {
+    const category = req.query.category || 'animals'; // Default to 'Science' if no category is specified
+    console.log(`Received request for random question in category: ${category}`);
+    const questionData = generateTrainingQuestion2(category);
+    if (questionData.error) {
+      throw new Error(questionData.error);
+    }
+    console.log('Generated question:', questionData);
+    res.json(questionData);
+  } catch (error) {
+    console.error('Error generating question:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//api store performance funkcija 
+//const { spawn } = require('child_process');
+
+app.post('/api/store-performance', authenticateToken, (req, res) => {
+  const { category, level, correctAnswers, incorrectAnswers, averageTime } = req.body;
+  const userId = req.user.id;
+
+  // Log the incoming request data and user ID
+  console.log('Received performance data:', { userId, category, level, correctAnswers, incorrectAnswers, averageTime });
+
+  // Prepare data for prediction
+  const totalQuestions = correctAnswers + incorrectAnswers;
+  const accuracy = correctAnswers / totalQuestions;
+  const timePerQuestion = averageTime / totalQuestions;
+  const speedScore = totalQuestions / averageTime;
+  const difficultyAdjustedScore = correctAnswers * level;
+  const normalizedScore = (correctAnswers - incorrectAnswers) / totalQuestions;
+
+  const userData = {
+    category,
+    correct_answers: correctAnswers,
+    incorrect_answers: incorrectAnswers,
+    average_time: parseFloat(averageTime), // Ensure average_time is a float
+    level,
+    total_questions: totalQuestions,
+    accuracy,
+    time_per_question: timePerQuestion,
+    speed_score: speedScore,
+    difficulty_adjusted_score: difficultyAdjustedScore,
+    normalized_score: normalizedScore
+  };
+
+  // Convert userData to JSON string
+  const userDataJson = JSON.stringify(userData);
+  console.log('User data for prediction:', userDataJson);
+
+  // Predict group using Python script
+  const pythonProcess = spawn('python', [path.join(__dirname, 'predict.py'), userDataJson]);
+
+  pythonProcess.stdout.on('data', (data) => {
+    const results = data.toString();
+    console.log('Prediction results:', results);
+
+    try {
+      const parsedResult = JSON.parse(results);  // Očekuje JSON odgovor iz Pythona
+      const predictedGroup = parsedResult.prediction;
+      console.log('Predicted group:', predictedGroup);
+
+      if (isNaN(predictedGroup)) {
+        console.error('Invalid predicted group received');
+        return res.status(500).json({ error: 'Invalid prediction result' });
+      }
+
+      // SQL upit za unos podataka
+      const query = `
+        INSERT INTO user_performance (user_id, category, level, correct_answers, incorrect_answers, average_time, \`group\`)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      console.log('Executing query:', query);
+      console.log('Query parameters:', [userId, category, level, correctAnswers, incorrectAnswers, parseFloat(averageTime), predictedGroup]);
+
+      db.query(query, [userId, category, level, correctAnswers, incorrectAnswers, parseFloat(averageTime), predictedGroup], (err, result) => {
+        if (err) {
+          console.error('Error storing performance data:', err);
+          return res.status(500).json({ error: 'Error storing performance data' });
+        }
+        console.log('Performance data stored successfully:', result);
+
+        // Izračun prosječne vrijednosti grupe za korisnika za određenu kategoriju
+        const avgGroupQuery = `
+          SELECT AVG(\`group\`) as avgGroup
+          FROM user_performance
+          WHERE user_id = ? AND category = ?
+        `;
+
+        db.query(avgGroupQuery, [userId, category], (err, avgResult) => {
+          if (err) {
+            console.error('Error calculating average group:', err);
+            return res.status(500).json({ error: 'Error calculating average group' });
+          }
+
+          let avgGroup = avgResult[0].avgGroup;
+          console.log('Average group before rounding:', avgGroup);
+
+          // Zaokruživanje prosječne vrijednosti grupe na najbliži cijeli broj
+          avgGroup = Math.round(avgGroup);
+          console.log('Average group after rounding:', avgGroup);
+
+          // Ažuriranje odgovarajućeg stupca u tablici users
+          const categoryColumn = `${category}_group`;
+          const updateUserGroupQuery = `
+            UPDATE users
+            SET ${categoryColumn} = ?
+            WHERE id = ?
+          `;
+
+          db.query(updateUserGroupQuery, [avgGroup, userId], (err, updateResult) => {
+            if (err) {
+              console.error('Error updating user group:', err);
+              return res.status(500).json({ error: 'Error updating user group' });
+            }
+
+            console.log('User group updated successfully:', updateResult);
+            res.status(200).json({ message: 'Performance data stored and user group updated successfully', group: predictedGroup });
+          });
+        });
+      });
+    } catch (parseError) {
+      console.error('Error parsing prediction result:', parseError);
+      return res.status(500).json({ error: 'Error parsing prediction result' });
+    }
+  });
+
+  pythonProcess.stderr.on('data', (data) => {
+    console.error('Error predicting group:', data.toString());
+    return res.status(500).json({ error: 'Error predicting group' });
+  });
+});
+
+// Ruta za dohvaćanje statistike korisnika
+// Ruta za dohvaćanje statistike korisnika
+app.get('/api/user-statistics', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  const query = `
+    SELECT category, AVG(correct_answers) as avg_correct_answers, AVG(incorrect_answers) as avg_incorrect_answers, AVG(average_time) as avg_time
+    FROM user_performance
+    WHERE user_id = ?
+    GROUP BY category
+  `;
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching user statistics:', err);
+      return res.status(500).json({ error: 'Error fetching user statistics' });
+    }
+
+    console.log('User statistics:', results); // Debug log
+
+    const groupQuery = `
+      SELECT animals_group, movies_group, science_group, history_group, geography_group
+      FROM users
+      WHERE id = ?
+    `;
+
+    db.query(groupQuery, [userId], (err, groupResults) => {
+      if (err) {
+        console.error('Error fetching user groups:', err);
+        return res.status(500).json({ error: 'Error fetching user groups' });
+      }
+
+      console.log('User groups:', groupResults); // Debug log
+
+      res.json({ statistics: results, groups: groupResults[0] });
+    });
+  });
+});
+
 // Pokrenite server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server radi na portu ${PORT}`);
 });
