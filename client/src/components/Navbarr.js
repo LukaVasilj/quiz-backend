@@ -53,13 +53,13 @@ const Navbar = ({ username, profilePicture, onLogout, showLogoutOnly }) => {
               {playMenuVisible && (
                 <div className="dropdown-menuu">
                 <div className="dropdown-item" onClick={() => handleMenuClick('/quiz')}>
-                  <i className="fas fa-puzzle-piece"></i> Play with friend!
+                  <i className="fas fa-gamepad"></i> Play with friend!
                 </div>
                 <div className="dropdown-item" onClick={() => handleMenuClick('/trening')}>
                   <i className="fas fa-dumbbell"></i> Trening!
                 </div>
                 <div className="dropdown-item" onClick={() => handleMenuClick('/matchmaking')}>
-                  <i className="fas fa-gamepad"></i> Play online!
+                  <i className="fas fa-puzzle-piece"></i> Play online!
                 </div>
               </div>
               )}

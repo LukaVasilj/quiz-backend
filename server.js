@@ -214,7 +214,7 @@ const updateAchievements = (userId, points, quizzesCompleted, correctAnswers) =>
 // WebSocket logika za matchmaking
 // WebSocket logika za matchmaking
 const onlineUsers = new Set(); // Track online users
-const waitingPlayers = {}; // Track waiting players by category and group
+const waitingMatchmakingPlayers = {}; // Track waiting players by category and group
 let matchmakingRoomUsersData = {}; // Svi podaci o korisnicima po sobama za matchmaking kviz
 
 io.on('connection', (socket) => {
@@ -238,33 +238,36 @@ io.on('connection', (socket) => {
       const userGroup = results[0].userGroup;
       console.log(`User ${username} is in group ${userGroup} for category ${category}`);
 
-      if (!waitingPlayers[category]) {
-        waitingPlayers[category] = {};
+      // Store user's group in socket object
+      socket.userGroup = userGroup;
+
+      if (!waitingMatchmakingPlayers[category]) {
+        waitingMatchmakingPlayers[category] = {};
       }
 
-      if (!waitingPlayers[category][userGroup]) {
-        waitingPlayers[category][userGroup] = [];
+      if (!waitingMatchmakingPlayers[category][userGroup]) {
+        waitingMatchmakingPlayers[category][userGroup] = [];
       }
 
-      console.log('Waiting players in category and group:', category, userGroup, waitingPlayers[category][userGroup]); // Debug log
+      console.log('Waiting players in category and group:', category, userGroup, waitingMatchmakingPlayers[category][userGroup]); // Debug log
 
-      if (waitingPlayers[category][userGroup].length > 0) {
-        const opponentSocketId = waitingPlayers[category][userGroup].shift();
+      if (waitingMatchmakingPlayers[category][userGroup].length > 0) {
+        const opponentSocketId = waitingMatchmakingPlayers[category][userGroup].shift();
         const roomId = `room_${Date.now()}`;
         console.log(`Creating room with ID: ${roomId}`); // Debug log
         socket.join(roomId);
         io.to(opponentSocketId).socketsJoin(roomId);
         const opponentSocket = io.sockets.sockets.get(opponentSocketId);
         io.to(roomId).emit('matchFound', { roomId, users: [
-          { id: socket.userId, username: socket.username, points: 0 },
-          { id: opponentSocket.userId, username: opponentSocket.username, points: 0 }
+          { id: socket.userId, username: socket.username, points: 0, group: socket.userGroup },
+          { id: opponentSocket.userId, username: opponentSocket.username, points: 0, group: opponentSocket.userGroup }
         ]});
         console.log(`Match found! Room ID: ${roomId}`);
 
         // Initialize room data
         matchmakingRoomUsersData[roomId] = [
-          { id: socket.userId, username: socket.username, points: 0 },
-          { id: opponentSocket.userId, username: opponentSocket.username, points: 0 }
+          { id: socket.userId, username: socket.username, points: 0, group: socket.userGroup },
+          { id: opponentSocket.userId, username: opponentSocket.username, points: 0, group: opponentSocket.userGroup }
         ];
 
         // Pokreni kviz nakon 5 sekundi
@@ -272,7 +275,7 @@ io.on('connection', (socket) => {
           startMatchmakingQuiz(roomId, category);
         }, 5000);
       } else {
-        waitingPlayers[category][userGroup].push(socket.id);
+        waitingMatchmakingPlayers[category][userGroup].push(socket.id);
         socket.emit('findingOpponent');
         console.log(`Korisnik ${username} čeka protivnika u kategoriji ${category} i grupi ${userGroup}`);
       }
@@ -282,21 +285,30 @@ io.on('connection', (socket) => {
   const fetchNextMatchmakingQuestion = async (roomId, category) => {
     try {
       let questionData;
-      const random = Math.random() < 0.5;
-      if (random) {
+      const room = io.sockets.adapter.rooms.get(roomId);
+      const userGroup = room.userGroup; // Assume both users are in the same group
+
+      if (userGroup <= 2) {
+        // Only multiple-choice questions
         questionData = generateTrainingQuestion(category);
+      } else if (userGroup === 3) {
+        // Both multiple-choice and input field questions
+        const random = Math.random() < 0.5;
+        questionData = random ? generateTrainingQuestion(category) : generateTrainingQuestion2(category);
       } else {
+        // Only input field questions
         questionData = generateTrainingQuestion2(category);
       }
+
       if (questionData.error) {
         throw new Error(questionData.error);
       }
+
       const { question, correctAnswer, type, options } = questionData;
       console.log(`Generated question for room ID: ${roomId}`); // Debug log
       io.to(roomId).emit('newQuestion', { question, correctAnswer, type, options });
 
       // Spremanje točnog odgovora u sobu
-      let room = io.sockets.adapter.rooms.get(roomId);
       room.correctAnswer = correctAnswer;
       room.userAnswers = []; // Resetiramo odgovore za novu rundu
 
@@ -323,6 +335,7 @@ io.on('connection', (socket) => {
     room.questionCount = 0; // Dodajemo brojač pitanja
     room.usedFacts = room.usedFacts || []; // Dodajemo polje za praćenje korištenih pitanja
     room.category = category; // Spremamo kategoriju u sobu
+    room.userGroup = matchmakingRoomUsersData[roomId][0].group; // Assume both users are in the same group
 
     setTimeout(() => fetchNextMatchmakingQuestion(roomId, category), 5000);
   };
@@ -458,10 +471,10 @@ io.on('connection', (socket) => {
     console.log('Online users after disconnect:', Array.from(onlineUsers)); // Debug log
 
     // Remove user from waiting players
-    for (const category in waitingPlayers) {
-      for (const group in waitingPlayers[category]) {
-        waitingPlayers[category][group] = waitingPlayers[category][group].filter(id => id !== socket.id);
-        console.log(`Updated waiting players in category ${category} and group ${group}:`, waitingPlayers[category][group]); // Debug log
+    for (const category in waitingMatchmakingPlayers) {
+      for (const group in waitingMatchmakingPlayers[category]) {
+        waitingMatchmakingPlayers[category][group] = waitingMatchmakingPlayers[category][group].filter(id => id !== socket.id);
+        console.log(`Updated waiting players in category ${category} and group ${group}:`, waitingMatchmakingPlayers[category][group]); // Debug log
       }
     }
 
@@ -476,6 +489,7 @@ io.on('connection', (socket) => {
     }
   });
 });
+
 
 // Endpoint to get all users and their online status
 app.get('/users', authenticateToken, (req, res) => {
@@ -862,7 +876,7 @@ app.post('/login', (req, res) => {
       return res.status(401).send('Pogrešna lozinka.');
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
     console.log('Generated token:', token); // Log the generated token
     res.json({ token, username: user.username, role: user.role });
   });

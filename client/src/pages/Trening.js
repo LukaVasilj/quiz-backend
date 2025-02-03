@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbarr';  // Import the Navbar component
 import '../App.css';
+import '../Trening.css'; // Import the CSS file for Trening component
 
 const Trening = () => {
   const [username, setUsername] = useState(''); // Define the username state
   const [profilePicture, setProfilePicture] = useState('');
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [userAnswer, setUserAnswer] = useState('');
+  const [userAnswer, setUserAnswer] = useState(''); // Define the user answer state
   const [score, setScore] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [quizEnded, setQuizEnded] = useState(false);
@@ -17,6 +18,10 @@ const Trening = () => {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0); // State to store incorrect answers count
   const [timeTaken, setTimeTaken] = useState([]); // State to store time taken for each question
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false); // State to show correct answer
+  const [inputDisabled, setInputDisabled] = useState(false); // Define the input disabled state
+  const [buttonDisabled, setButtonDisabled] = useState(false); // Define the button disabled state
+  const [submittedAnswer, setSubmittedAnswer] = useState(''); // Define the submitted answer state
+  const [answerClasses, setAnswerClasses] = useState([]); // Define the answer classes state
   const timerRef = useRef(null); // Ref to store the timer
 
   const totalQuestions = 5;
@@ -67,26 +72,39 @@ const Trening = () => {
     try {
       console.log('Fetching next question...');
       let response;
+      let url;
       if (selectedLevel === 1) {
-        response = await fetch(`http://localhost:5000/api/training-question?category=${selectedCategory}`);
+        url = `http://localhost:5000/api/training-question?category=${selectedCategory}`;
       } else if (selectedLevel === 2) {
         const random = Math.random() < 0.5;
         if (random) {
-          response = await fetch(`http://localhost:5000/api/training-question?category=${selectedCategory}`);
+          url = `http://localhost:5000/api/training-question?category=${selectedCategory}`;
         } else {
-          response = await fetch(`http://localhost:5000/api/random-question?category=${selectedCategory}`);
+          url = `http://localhost:5000/api/random-question?category=${selectedCategory}`;
         }
       } else {
-        response = await fetch(`http://localhost:5000/api/random-question?category=${selectedCategory}`);
+        url = `http://localhost:5000/api/random-question?category=${selectedCategory}`;
       }
+      console.log('Fetching URL:', url);
+      response = await fetch(url);
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
       }
       console.log('Fetched question:', data);
 
+      // Check if the question is of type 'multiple-choice' and has options
+      if (data.type === 'multiple-choice' && !data.options) {
+        throw new Error('No options available for this question');
+      }
+
       setCurrentQuestion(data);
       setShowCorrectAnswer(false); // Hide the correct answer when fetching a new question
+      setInputDisabled(false); // Enable input
+      setButtonDisabled(false); // Enable button
+      setSubmittedAnswer(''); // Reset submitted answer
+      setUserAnswer(''); // Reset user answer
+      setAnswerClasses(data.type === 'multiple-choice' ? new Array(data.options.length).fill('option-button2') : []); // Reset answer classes
       startTimer(); // Start the timer when a new question is fetched
     } catch (error) {
       console.error('Error fetching question:', error);
@@ -103,9 +121,24 @@ const Trening = () => {
     setTimeTaken((prevTimes) => [...prevTimes, timeElapsed]);
   };
 
-  const handleAnswer = async (answer) => {
+  const handleAnswer = async (answer, index) => {
     stopTimer(); // Stop the timer when the user answers
     console.log('Answer selected:', answer);
+    setButtonDisabled(true); // Disable button after submitting answer
+    setInputDisabled(true); // Disable input after submitting answer
+    setSubmittedAnswer(answer); // Set the submitted answer
+
+    if (currentQuestion.type === 'multiple-choice') {
+      const newAnswerClasses = currentQuestion.options.map((option) => {
+        if (option === currentQuestion.correctAnswer) {
+          return 'option-button2 correct';
+        } else {
+          return 'option-button2 incorrect';
+        }
+      });
+      setAnswerClasses(newAnswerClasses);
+    }
+
     if (answer === currentQuestion.correctAnswer) {
       console.log('Correct answer!');
       setScore((prevScore) => prevScore + 1);
@@ -134,7 +167,6 @@ const Trening = () => {
 
   const submitInputAnswer = () => {
     handleAnswer(userAnswer);
-    setUserAnswer('');
   };
 
   const sendPerformanceData = async (category, level, correctAnswers, incorrectAnswers, averageTime) => {
@@ -167,7 +199,7 @@ const Trening = () => {
       const timer = setTimeout(() => {
         console.log('Refreshing page...');
         window.location.reload();
-      }, 7000); // Reloads page after 15 seconds to allow user to see results
+      }, 15000); // Reloads page after 15 seconds to allow user to see results
       return () => clearTimeout(timer);
     }
   }, [quizEnded, category, level, correctAnswers, incorrectAnswers, timeTaken]);
@@ -179,38 +211,40 @@ const Trening = () => {
   return (
     <>
       <Navbar username={username} profilePicture={profilePicture} onLogout={handleLogout} />
-      <div className="help-container">
-        <div className="background-image"></div>
-        <div className="help-content">
-          <h1>Help & Support</h1>
-          <div className="help-section">
-            <h2>Frequently Asked Questions (FAQs)</h2>
+      <div className="quiz-container2">
+        <div className="background-image2"></div>
+        <div className="quiz-content2">
+          <h1>Training Quiz</h1>
+          <div className="quiz-section2">
             {!quizStarted ? (
-              <div>
-                <select onChange={(e) => setCategory(e.target.value)}>
-                  <option value="animals">Animals</option>
-                  <option value="movies">Movies</option>
-                  <option value="science">Science</option>
-                  <option value="history">History</option>
-                  <option value="geography">Geography</option>
-                  <option value="general">General</option>
+              <div className="start-section2">
+                <h3>Select a category and level to start the quiz</h3>
+                <select onChange={(e) => setCategory(e.target.value)} className="category-select2">
+                <option value="animals">🐘 Animals</option>
+                <option value="movies">🎬 Movies</option>
+                  <option value="science">🔬 Science</option>
+                  <option value="history">📜 History</option>
+                  <option value="geography">🌍 Geography</option>
+                  <option value="general">❓ General</option>
                 </select>
-                <button onClick={() => startQuiz(1, category)}>Level 1</button>
-                <button onClick={() => startQuiz(2, category)}>Level 2</button>
-                <button onClick={() => startQuiz(3, category)}>Level 3</button>
+                <div className="level-buttons2">
+                  <button onClick={() => startQuiz(1, category)} className="level-button2">Level 1</button>
+                  <button onClick={() => startQuiz(2, category)} className="level-button2">Level 2</button>
+                  <button onClick={() => startQuiz(3, category)} className="level-button2">Level 3</button>
+                </div>
               </div>
             ) : quizEnded ? (
-              <div className="end-results-container">
+              <div className="end-results-container2">
                 <h3>Quiz Finished!</h3>
                 <h3>Results:</h3>
                 <p>Your score: {score} / {totalQuestions}</p>
                 <p>Correct answers: {correctAnswers}</p>
                 <p>Incorrect answers: {incorrectAnswers}</p>
-                
+                <p>Average time per question: {timeTaken.length > 0 ? (timeTaken.reduce((a, b) => a + b, 0) / timeTaken.length).toFixed(2) : 0} seconds</p>
                 {console.log('Displaying results:', { score, totalQuestions })}
               </div>
             ) : (
-              <div>
+              <div className="question-section2">
                 {currentQuestion ? (
                   currentQuestion.error ? (
                     <p>{currentQuestion.error}</p>
@@ -218,27 +252,38 @@ const Trening = () => {
                     <>
                       <h3>Question {questionIndex + 1} / {totalQuestions}</h3>
                       <h3>{currentQuestion.question}</h3>
-                      {console.log('Current question type:', currentQuestion.type)}
+                      {console.log('Current question type:', currentQuestion.type)}                    
                       {currentQuestion.type === 'multiple-choice' ? (
-                        currentQuestion.options.map((option, index) => (
-                          <button key={index} onClick={() => handleAnswer(option)}>
-                            {option}
-                          </button>
-                        ))
+                        <div className="options-grid2">
+                          {currentQuestion.options.map((option, index) => (
+                            <button key={index} onClick={() => handleAnswer(option, index)} disabled={buttonDisabled} className={answerClasses[index]}>
+                              {option}
+                            </button>
+                          ))}
+                        </div>
                       ) : currentQuestion.type === 'input' ? (
-                        <div>
+                        <div className="input-section2">
                           <input
                             type="text"
                             value={userAnswer}
                             onChange={handleInputAnswer}
+                            disabled={inputDisabled}
+                            className="answer-input2"
                           />
-                          <button onClick={submitInputAnswer}>Submit</button>
+                          <button onClick={submitInputAnswer} disabled={inputDisabled} className="submit-button2">Submit</button>
                         </div>
                       ) : (
                         <p>Unknown question type</p>
                       )}
                       {showCorrectAnswer && (
-                        <p>Correct answer: {currentQuestion.correctAnswer}</p>
+                        <div className="correct-answer-section2">
+                          <div className="answer-box correct-answer-box">
+                            <p>Correct answer: {currentQuestion.correctAnswer}</p>
+                          </div>
+                          <div className={`answer-box your-answer-box ${submittedAnswer === currentQuestion.correctAnswer ? 'correct' : 'incorrect'}`}>
+                            <p>Your answer: {submittedAnswer}</p>
+                          </div>
+                        </div>
                       )}
                     </>
                   )
@@ -249,12 +294,14 @@ const Trening = () => {
             )}
           </div>
         </div>
-        <div className="statistics-container">
-          <h2>Statistics</h2>
-          <p>Correct answers: {correctAnswers}</p>
-          <p>Incorrect answers: {incorrectAnswers}</p>
-          <p>Average time per question: {timeTaken.length > 0 ? (timeTaken.reduce((a, b) => a + b, 0) / timeTaken.length).toFixed(2) : 0} seconds</p>
-        </div>
+        {quizStarted && !quizEnded && (
+          <div className="statistics-container2">
+            <h2>Statistics</h2>
+            <p>Correct answers: {correctAnswers}</p>
+            <p>Incorrect answers: {incorrectAnswers}</p>
+            <p>Average time per question: {timeTaken.length > 0 ? (timeTaken.reduce((a, b) => a + b, 0) / timeTaken.length).toFixed(2) : 0} seconds</p>
+          </div>
+        )}
       </div>
     </>
   );

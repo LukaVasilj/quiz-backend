@@ -1,0 +1,210 @@
+.quiz-container2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 85vh;
+    background: linear-gradient(to right, #325061,#678ca1 ,#292e49);    color: #fff;
+    text-align: center;
+    padding: 20px;
+    width: 50rem;
+    margin-top: 50px;
+    border-radius: 5%;
+  }
+  
+  
+  
+  .quiz-content2 {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 30rem;
+  }
+  
+  .start-section2, .end-results-container2, .question-section2 {
+    margin-top: 20px;
+  }
+  
+  .category-select2 {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    margin-top: 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    width: 100%;
+    max-width: 150px;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="#333" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+  }
+  
+  .level-buttons2 {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .level-button2 {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #136fd8;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .level-button2:hover {
+    background: #022d5e;
+  }
+  
+  .option-button2 {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #136fd8;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background 0.3s;
+  }
+  
+  .option-button2:hover {
+    background: #022d5e;
+  }
+  
+  .option-button2.correct {
+    background: #4CAF50; /* Green */
+  }
+  
+  .option-button2.incorrect {
+    background: #f44336; /* Red */
+  }
+
+  
+  
+  .input-section2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .answer-input2 {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+  }
+  
+  .submit-button2 {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #136fd8;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+  }
+  
+  .submit-button2:hover {
+    background: #022d5e;
+  }
+  
+  .correct-answer-section2 {
+    margin-top: 20px;
+  }
+  
+  .statistics-container2 {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+    font-size: large;
+  }
+
+  
+  
+  @media (max-width: 768px) {
+    .quiz-content2, .statistics-container2 {
+      width: 90%;
+    }
+  
+    .level-buttons2 {
+      flex-direction: column;
+    }
+  
+    .level-button2 {
+      margin-bottom: 10px;
+    }
+  }
+
+  .options-grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .correct-answer-section2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .answer-box {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    width: 80%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .correct-answer-box {
+    background-color: #7bf898; /* Light green background */
+    color: #035617; /* Dark green text */
+  }
+  
+  .your-answer-box.correct {
+    background-color: #7bf898; /* Light green background */
+    color: #035617; /* Dark green text */
+  }
+  
+  .your-answer-box.incorrect {
+    background-color: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text */
+  }
+
+  .end-results-container2 {
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    font-size: large;
+    text-align: center;
+  }
+  
+  .end-results-container2 h3 {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  
+  .end-results-container2 p {
+    font-size: 18px;
+    margin: 5px 0;
+  }
