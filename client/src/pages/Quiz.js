@@ -64,7 +64,7 @@ const Quiz = ({ hints, setHints }) => {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/users', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data);
@@ -72,28 +72,26 @@ const Quiz = ({ hints, setHints }) => {
         console.error('Error fetching users:', error);
       }
     };
-  
+    
     fetchUsers();
-  
-
+    
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/profile', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfilePicture(response.data.profile_picture);
         setHints(response.data.hints); // Set the hints state
-
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
     };
-
+    
     fetchProfile();
-
+    
     const fetchFriends = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/friends', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/friends`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFriends(response.data);
@@ -101,10 +99,10 @@ const Quiz = ({ hints, setHints }) => {
         console.error('Error fetching friends:', error);
       }
     };
-
+    
     fetchFriends();
-
-    const socketConnection = io('http://localhost:5000', {
+    
+    const socketConnection = io(`${process.env.REACT_APP_API_URL}`, {
       transports: ['websocket'],
       auth: {
         token: token

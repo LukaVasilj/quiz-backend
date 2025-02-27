@@ -11,12 +11,15 @@ const path = require('path');
 const fs = require('fs'); // Dodajte ovu liniju
 const { PythonShell } = require('python-shell');
 const { spawn } = require('child_process');
+const initDatabase = require('./initDatabase'); // Dodajte ovu liniju
+
 
 require('dotenv').config();
 
 const { generateRandomQuestionAndAnswer } = require('./questionGenerator');
 const { generateTrainingQuestion } = require('./trainingQuestionGenerator');
 const { generateTrainingQuestion2 } = require('./trainingQuestionGenerator2');
+
 
 
 // Add the generateHint function here
@@ -51,7 +54,7 @@ const io = socketIo(server, {
 });
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
@@ -82,7 +85,33 @@ db.connect((err) => {
   }
 });
 
+// Provjerite postojanje baze podataka
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD
+});
 
+connection.connect((err) => {
+  if (err) {
+    console.error('Greška pri spajanju na bazu:', err);
+  } else {
+    console.log('Spojen na MySQL server!');
+
+    connection.query("SHOW DATABASES LIKE 'quiz_app'", function (error, results, fields) {
+      if (error) throw error;
+
+      if (results.length === 0) {
+        // Ako baza podataka ne postoji, pokrenite inicijalizaciju baze podataka
+        initDatabase();
+      } else {
+        console.log('Database quiz_app already exists, skipping initialization');
+      }
+
+      connection.end();
+    });
+  }
+});
 
 // Middleware to authenticate user and attach userId and username to socket
 io.use((socket, next) => {

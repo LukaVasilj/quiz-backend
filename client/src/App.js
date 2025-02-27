@@ -34,7 +34,7 @@ function App() {
         const token = localStorage.getItem('token');
         if (token) {
           console.log('Fetching profile with token:', token); // Debug log
-          const response = await axios.get('http://localhost:5000/api/profile', {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log('Profile fetched:', response.data); // Debug log

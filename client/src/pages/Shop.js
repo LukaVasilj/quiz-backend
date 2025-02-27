@@ -22,7 +22,7 @@ const Shop = ({ setHints }) => {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:5000/api/profile', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -120,15 +120,15 @@ const Shop = ({ setHints }) => {
   const handlePurchaseHint = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.post('http://localhost:5000/shop/purchase-hint', {}, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shop/purchase-hint`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (response.data.success) {
         setUser({ ...user, coins: user.coins - 10, hints: user.hints + 1 });
         setHints(user.hints + 1); // Update the hints state
         setAnimation({ coins: true, hints: true });
-
+  
         setTimeout(() => {
           setAnimation({ coins: false, hints: false });
         }, 1000); // Reset animation after 1 second
@@ -145,10 +145,10 @@ const Shop = ({ setHints }) => {
     if (user.coins >= 20 && !cooldown) {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.post('http://localhost:5000/shop/open-chest', {}, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/shop/open-chest`, {}, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+  
         if (response.data.success) {
           const hintsWon = response.data.hintsWon;
           setUser({ ...user, coins: user.coins - 20, hints: user.hints + hintsWon });
@@ -178,10 +178,10 @@ const Shop = ({ setHints }) => {
     if (user.coins >= 50 && !secondCooldown) {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.post('http://localhost:5000/shop/open-second-chest', {}, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/shop/open-second-chest`, {}, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+  
         if (response.data.success) {
           const hintsWon = response.data.hintsWon;
           setUser({ ...user, coins: user.coins - 50, hints: user.hints + hintsWon });
@@ -210,16 +210,16 @@ const Shop = ({ setHints }) => {
   const handlePurchaseCoins = async (amount) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.post('http://localhost:5000/shop/purchase-coins', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shop/purchase-coins`, {
         amount,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (response.data.success) {
         setUser((prevUser) => ({ ...prevUser, coins: prevUser.coins + amount }));
         setAnimation({ coins: true, hints: false });
-
+  
         setTimeout(() => {
           setAnimation({ coins: false, hints: false });
         }, 1000); // Reset animation after 1 second

@@ -19,7 +19,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/admin/users', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
@@ -27,17 +27,17 @@ const AdminDashboard = () => {
       console.error('Error fetching users:', error);
     }
   };
-
+  
   const handleCreateUser = async () => {
     // Validacija da su sva polja popunjena
     if (!newUser.username || !newUser.email || !newUser.password || !newUser.role) {
       alert('Please fill in all fields');
       return;
     }
-
+  
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/admin/users', newUser, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/admin/users`, newUser, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewUser({ username: '', email: '', password: '', role: 'user' });
@@ -46,11 +46,11 @@ const AdminDashboard = () => {
       console.error('Error creating user:', error);
     }
   };
-
+  
   const handleUpdateUser = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/admin/users/${editUser.id}`, editUser, {
+      await axios.put(`${process.env.REACT_APP_API_URL}/admin/users/${editUser.id}`, editUser, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditUser(null);
@@ -59,14 +59,14 @@ const AdminDashboard = () => {
       console.error('Error updating user:', error);
     }
   };
-
+  
   const handleDeleteUser = async (id, username) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete ${username}?`);
     if (!confirmDelete) return;
-
+  
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/admin/users/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUsers();

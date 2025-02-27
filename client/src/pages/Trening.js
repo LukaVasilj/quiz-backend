@@ -34,7 +34,7 @@ const Trening = () => {
       try {
         const token = localStorage.getItem('token');
         console.log('Fetching profile with token:', token);
-        const response = await fetch('http://localhost:5000/api/profile', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -74,16 +74,16 @@ const Trening = () => {
       let response;
       let url;
       if (selectedLevel === 1) {
-        url = `http://localhost:5000/api/training-question?category=${selectedCategory}`;
+        url = `${process.env.REACT_APP_API_URL}/api/training-question?category=${selectedCategory}`;
       } else if (selectedLevel === 2) {
         const random = Math.random() < 0.5;
         if (random) {
-          url = `http://localhost:5000/api/training-question?category=${selectedCategory}`;
+          url = `${process.env.REACT_APP_API_URL}/api/training-question?category=${selectedCategory}`;
         } else {
-          url = `http://localhost:5000/api/random-question?category=${selectedCategory}`;
+          url = `${process.env.REACT_APP_API_URL}/api/random-question?category=${selectedCategory}`;
         }
       } else {
-        url = `http://localhost:5000/api/random-question?category=${selectedCategory}`;
+        url = `${process.env.REACT_APP_API_URL}/api/random-question?category=${selectedCategory}`;
       }
       console.log('Fetching URL:', url);
       response = await fetch(url);
@@ -92,12 +92,12 @@ const Trening = () => {
         throw new Error(data.error);
       }
       console.log('Fetched question:', data);
-
+  
       // Check if the question is of type 'multiple-choice' and has options
       if (data.type === 'multiple-choice' && !data.options) {
         throw new Error('No options available for this question');
       }
-
+  
       setCurrentQuestion(data);
       setShowCorrectAnswer(false); // Hide the correct answer when fetching a new question
       setInputDisabled(false); // Enable input
@@ -172,7 +172,7 @@ const Trening = () => {
   const sendPerformanceData = async (category, level, correctAnswers, incorrectAnswers, averageTime) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/store-performance', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/store-performance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

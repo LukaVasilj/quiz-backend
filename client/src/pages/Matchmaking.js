@@ -37,7 +37,7 @@ const Matchmaking = () => {
     // Fetch user profile information
     const fetchProfile = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/profile', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -52,7 +52,7 @@ const Matchmaking = () => {
     console.log('Connecting to socket.io with token:', token); // Debug log
 
     // Connect to the server with token
-    matchmakingSocket = io('http://localhost:5000', {
+    matchmakingSocket = io(`${process.env.REACT_APP_API_URL}`, {
       auth: {
         token: token
       },

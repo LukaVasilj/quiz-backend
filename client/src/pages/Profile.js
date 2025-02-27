@@ -21,7 +21,7 @@ const Profile = () => {
           throw new Error('No token found');
         }
         console.log('Fetching profile with token:', token); // Debug log
-        const response = await axios.get('http://localhost:5000/api/profile', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Profile data:', response.data); // Debug log
@@ -35,7 +35,7 @@ const Profile = () => {
     const fetchStatistics = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/user-statistics', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user-statistics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Statistics data:', response.data); // Debug log
@@ -61,7 +61,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/change-password', { password: newPassword }, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/change-password`, { password: newPassword }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage('Password changed successfully!');
@@ -81,7 +81,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/upload-profile-picture', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/upload-profile-picture`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -172,7 +172,7 @@ const Profile = () => {
       <h2>Profile</h2>
       <div className="profile-info">
         <img
-          src={`http://localhost:5000${profilePicture}`}
+          src={`${process.env.REACT_APP_API_URL}${profilePicture}`}
           alt="Profile"
           className="profile-picture"
         /><img src={levelIconUrl} alt={`Level ${userLevel}`} className="level-iconn" />
@@ -189,7 +189,7 @@ const Profile = () => {
             {userInfo.achievements && userInfo.achievements.length > 0 ? (
               userInfo.achievements.map((achievement) => (
                 <div key={achievement.id} className="profile-achievement-item">
-                  <img src={`http://localhost:5000/icons/${achievement.icon}`} alt={achievement.name} className="profile-icon" />
+                  <img src={`${process.env.REACT_APP_API_URL}/icons/${achievement.icon}`} alt={achievement.name} className="profile-icon" />
                   <p>{achievement.name}</p>
                 </div>
               ))

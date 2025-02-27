@@ -19,19 +19,19 @@ const Dashboard = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/dashboard', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/dashboard`, {
           method: 'GET',  // Provjerite da je metoda GET
           headers: {
             'Authorization': `Bearer ${token}`,  // Dodaj token u Authorization header
           },
         });
-
+    
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Greška u odgovoru: ', errorText);  // Ispiši grešku u konzolu
           throw new Error('Neuspješan odgovor od servera');
         }
-
+    
         const data = await response.json();
         console.log('Dohvaćeni podaci:', data);
         setUserData(data);  // Spremi korisničke podatke
@@ -41,11 +41,11 @@ const Dashboard = () => {
         setLoading(false);  // Postavi loading na false bez obzira na ishod
       }
     };
-
+    
     fetchData();  // Pozovi fetch funkciju
 
     // Povezivanje sa socket.io serverom
-    const socketConnection = io('http://localhost:5000');  // Povezivanje sa serverom
+    const socketConnection = io(`${process.env.REACT_APP_API_URL}`);  // Povezivanje sa serverom
     setSocket(socketConnection);
 
     return () => {

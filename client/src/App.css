@@ -1583,7 +1583,7 @@ body {
 .messages-container ul {
   flex-grow: 1;
   overflow-y: auto;
-  background:url(C:\Users\Luka\Desktop\quiz-app\client\public\slike\whatsapp.jpg) no-repeat;
+  background: black; 
   background-size: cover;
   border-radius: 20px;
   padding: 10px;

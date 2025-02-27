@@ -34,12 +34,15 @@ function Home() {
     };
   }, []);
 
+  
+
   return (
     <div>
       <div>
 
         {/* Slider Section */}
-        <section className="slider_section section">
+        <section className="slider_section section" style={{ backgroundImage: "url('/slike/hero-bg.png')" }}>
+
           
           <div id="customCarousel1" className="carousel slide" data-ride="carousel">
             <div className="carousel-inner">

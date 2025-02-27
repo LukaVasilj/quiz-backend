@@ -23,7 +23,7 @@ const Friends = () => {
     const fetchFriends = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/friends', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/friends`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Friends fetched:', response.data); // Debug log
@@ -38,7 +38,7 @@ const Friends = () => {
     const fetchFriendRequests = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/friend-requests', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/friend-requests`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Friend requests fetched:', response.data); // Debug log
@@ -52,7 +52,7 @@ const Friends = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/profile', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Profile fetched:', response.data); // Debug log
@@ -72,7 +72,7 @@ const Friends = () => {
       const token = localStorage.getItem('token');
       console.log('Sending message to receiverId:', receiverId); // Debug log
       console.log('Message content:', newMessage); // Debug log
-      const response = await axios.post('http://localhost:5000/send-message', { receiverId, content: newMessage }, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/send-message`, { receiverId, content: newMessage }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Message sent response:', response.data); // Debug log
@@ -89,7 +89,7 @@ const Friends = () => {
     try {
       const token = localStorage.getItem('token');
       console.log('Fetching messages for receiverId:', receiverId); // Debug log
-      const response = await axios.get(`http://localhost:5000/messages?receiverId=${receiverId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/messages?receiverId=${receiverId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Messages fetched response:', response.data); // Debug log
@@ -99,27 +99,16 @@ const Friends = () => {
     }
   };
 
-  const handleMarkMessageRead = async (messageId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/mark-message-read', { messageId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      console.log('Message marked as read:', response.data); // Debug log
-      fetchMessages(selectedFriend.id); // Refresh messages
-    } catch (error) {
-      console.error('Error marking message as read:', error);
-    }
-  };
+  
 
   const handleSearch = async (e) => {
     const searchTerm = e.target.value;
     setFriendUsername(searchTerm);
-
+  
     if (searchTerm.length > 1) {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5000/search-users?q=${searchTerm}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/search-users?q=${searchTerm}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Search results:', response.data); // Debug log
@@ -135,7 +124,7 @@ const Friends = () => {
   const handleAddFriend = async (username) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/add-friend', { friendUsername: username }, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/add-friend`, { friendUsername: username }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Add friend response:', response.data); // Debug log
@@ -151,7 +140,7 @@ const Friends = () => {
   const handleAcceptFriend = async (friendId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/accept-friend', { friendId }, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/accept-friend`, { friendId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Accept friend response:', response.data); // Debug log
@@ -165,7 +154,7 @@ const Friends = () => {
   const handleDeclineFriend = async (friendId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/decline-friend', { friendId }, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/decline-friend`, { friendId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Decline friend response:', response.data); // Debug log
@@ -178,7 +167,7 @@ const Friends = () => {
   const handleDeleteFriend = async (friendId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete('http://localhost:5000/delete-friend', {
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/delete-friend`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { friendId }
       });
@@ -193,7 +182,7 @@ const Friends = () => {
     try {
       const token = localStorage.getItem('token');
       console.log('Fetching profile for friendId:', friendId); // Debug log
-      const response = await axios.get(`http://localhost:5000/api/profile/${friendId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/profile/${friendId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('Friend profile fetched response:', response.data); // Debug log
@@ -264,7 +253,8 @@ const Friends = () => {
               {searchResults.length > 0 && (
                 <ul className="search-results">
                   {searchResults.map((user) => {
-                    const profilePictureUrl = user.profile_picture ? `http://localhost:5000${user.profile_picture}` : 'http://localhost:5000/uploads/default.jpg';
+                    const profilePictureUrl = user.profile_picture ? `${process.env.REACT_APP_API_URL}${user.profile_picture}` : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`;
+
                     return (
                       <li key={user.id} onClick={() => handleAddFriend(user.username)}>
                         <img src={profilePictureUrl} alt="Profile" className="friends-profile-picture" /> {user.username} <FaUserPlus />
@@ -285,7 +275,7 @@ const Friends = () => {
             <div className="section-content">
               <ul>
                 {friendRequests.map((request, index) => {
-                  const profilePictureUrl = request.profile_picture ? `http://localhost:5000${request.profile_picture}` : 'http://localhost:5000/uploads/default.jpg';
+                  const profilePictureUrl = request.profile_picture ? `${process.env.REACT_APP_API_URL}${request.profile_picture}` : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`;
                   return (
                     <li key={index}>
                       <img src={profilePictureUrl} alt="Profile" className="friends-profile-picture" /> {request.username}
@@ -311,7 +301,7 @@ const Friends = () => {
             </thead>
             <tbody>
               {friends.map((friend, index) => {
-                const profilePictureUrl = friend.profile_picture ? `http://localhost:5000${friend.profile_picture}` : 'http://localhost:5000/uploads/default.jpg';
+                const profilePictureUrl = friend.profile_picture ? `${process.env.REACT_APP_API_URL}${friend.profile_picture}` : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`;
                 console.log('Friend profile picture URL:', profilePictureUrl); // Debug log
                 return (
                   <tr key={index}>
@@ -384,7 +374,7 @@ const Friends = () => {
           <div className="friend-profile">
             <button className="close-button" onClick={handleCloseProfile}><FaTimes /> Close Profile</button>
             <h2>Friend Profile</h2>
-            <img src={`http://localhost:5000${selectedFriend.profile_picture}`} alt="Profile" className="profile-picture" />
+            <img src={`${process.env.REACT_APP_API_URL}${selectedFriend.profile_picture}`} alt="Profile" className="profile-picture" />
             <p><span className="profile-label">Username:</span> {selectedFriend.username}</p>
             <p><span className="profile-label">Points:</span> {selectedFriend.points}</p>
             <p><span className="profile-label">Level:</span> {calculateLevel(selectedFriend.points)}</p>
@@ -397,7 +387,7 @@ const Friends = () => {
                 {selectedFriend.achievements && selectedFriend.achievements.length > 0 ? (
                   selectedFriend.achievements.map((achievement) => (
                     <div key={achievement.id} className="achievement-itemm">
-                      <img src={`http://localhost:5000/icons/${achievement.icon}`} alt="Achievement" className="achievement-icon" />
+                      <img src={`${process.env.REACT_APP_API_URL}/icons/${achievement.icon}`} alt="Achievement" className="achievement-icon" />
                     </div>
                   ))
                 ) : (

@@ -82,8 +82,8 @@ const Navbar = ({ username, profilePicture, onLogout, showLogoutOnly }) => {
           </div>
         )}
         <div className="user-info" onClick={toggleDropdown}>
-          <img src={`http://localhost:5000${profilePicture}` || 'default-profile.png'} alt="Profile" className="navbar-profile-picture" />
-          <button className="dropdown-toggle">{username} ▼</button>
+        <img src={`${process.env.REACT_APP_API_URL}${profilePicture}` || 'default-profile.png'} alt="Profile" className="navbar-profile-picture" />
+        <button className="dropdown-toggle">{username} ▼</button>
         </div>
         {dropdownVisible && (
           <div className="dropdown-menu">

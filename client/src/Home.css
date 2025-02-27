@@ -59,7 +59,7 @@ a:focus {
 
 /* Slider Section */
 .slider_section {
-  background-image: url(C:\Users\Luka\Desktop\quiz-app\client\public\slike\hero-bg.png);
+  
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -72,6 +72,7 @@ a:focus {
   height: 130vh;
   margin: 0;
 }
+
 
 .slider_section .row {
   align-items: center;

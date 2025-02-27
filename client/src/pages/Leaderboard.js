@@ -11,27 +11,27 @@ const Leaderboard = () => {
 
   useEffect(() => {
     // Fetch leaderboard data
-    fetch('http://localhost:5000/leaderboard')
-      .then(response => response.json())
-      .then(data => setPlayers(data))
-      .catch(error => console.error('Error fetching leaderboard data:', error));
+    fetch(`${process.env.REACT_APP_API_URL}/leaderboard`)
+    .then(response => response.json())
+    .then(data => setPlayers(data))
+    .catch(error => console.error('Error fetching leaderboard data:', error));
 
-    // Fetch user profile information
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        setUsername(data.username);
-        setProfilePicture(data.profile_picture);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    };
+  // Fetch user profile information
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setUsername(data.username);
+      setProfilePicture(data.profile_picture);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
-    fetchProfile();
+  fetchProfile();
 
     // Update time left every second
     const timer = setInterval(() => {
@@ -108,7 +108,7 @@ const Leaderboard = () => {
         className = 'bronze';
         trophy = '🥉';
       }
-      const profilePictureUrl = player.profile_picture ? `http://localhost:5000${player.profile_picture}` : 'http://localhost:5000/uploads/default.jpg';
+      const profilePictureUrl = player.profile_picture ? `${process.env.REACT_APP_API_URL}${player.profile_picture}` : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`;
       const levelIconUrl = getLevelIcon(player.level);
       return (
         <tr key={index} className={`animated-row ${className}`}>
