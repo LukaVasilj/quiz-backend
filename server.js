@@ -1,3 +1,6 @@
+
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -11,10 +14,8 @@ const path = require('path');
 const fs = require('fs'); // Dodajte ovu liniju
 const { PythonShell } = require('python-shell');
 const { spawn } = require('child_process');
-const initDatabase = require('./initDatabase'); // Dodajte ovu liniju
 
 
-require('dotenv').config();
 
 const { generateRandomQuestionAndAnswer } = require('./questionGenerator');
 const { generateTrainingQuestion } = require('./trainingQuestionGenerator');
@@ -70,6 +71,13 @@ app.use('/icons', express.static(path.join(__dirname, 'icons')));
 
 // MySQL konfiguracija
 
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_NAME:', process.env.DB_NAME);
+
+
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -85,33 +93,7 @@ db.connect((err) => {
   }
 });
 
-// Provjerite postojanje baze podataka
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD
-});
 
-connection.connect((err) => {
-  if (err) {
-    console.error('Greška pri spajanju na bazu:', err);
-  } else {
-    console.log('Spojen na MySQL server!');
-
-    connection.query("SHOW DATABASES LIKE 'quiz_app'", function (error, results, fields) {
-      if (error) throw error;
-
-      if (results.length === 0) {
-        // Ako baza podataka ne postoji, pokrenite inicijalizaciju baze podataka
-        initDatabase();
-      } else {
-        console.log('Database quiz_app already exists, skipping initialization');
-      }
-
-      connection.end();
-    });
-  }
-});
 
 // Middleware to authenticate user and attach userId and username to socket
 io.use((socket, next) => {
@@ -1509,7 +1491,7 @@ app.post('/api/store-performance', authenticateToken, (req, res) => {
   });
 });
 
-// Ruta za dohvaćanje statistike korisnika
+
 // Ruta za dohvaćanje statistike korisnika
 app.get('/api/user-statistics', authenticateToken, (req, res) => {
   const userId = req.user.id;
